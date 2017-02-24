@@ -1,7 +1,16 @@
 server {
-	listen ${VIRTUAL_PORT};
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	server_name _;
+	return 301 https://$host$request_uri;
+}
+
+server {
+	listen ${VIRTUAL_PORT} ssl;
 	listen [::]:${VIRTUAL_PORT};
 	server_name ${VIRTUAL_HOST};
+	ssl_certificate /etc/nginx/ssl/nginx.crt;
+	ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
 	add_header X-Content-Type-Options nosniff always;
 	add_header X-Xss-Protection "1; mode=block" always;
@@ -28,7 +37,7 @@ server {
 		#add_header ETag "";
 	}
 
-	error_page 500 502 503 504 /500.html;
+	 error_page 500 502 503 504 /500.html;
 	client_max_body_size 4G;
 	keepalive_timeout 60;
 }
